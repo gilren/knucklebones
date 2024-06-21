@@ -1,0 +1,29 @@
+# Ignore LuaRocks default paths.
+.luarocks/
+
+# Ignore LuaRocks artifact files.
+*.src.rock
+*.zip
+*.tar.gz
+
+# Ignore Love2D compiled bytecode
+*.luac
+
+# Ignore OS-generated files
+.DS_Store
+Thumbs.db
+
+# Ignore temporary files created by editors or IDEs
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Ignore logs
+*.log
+
+# Ignore Love2D executable and build outputs
+love
+
+make_all.toml
