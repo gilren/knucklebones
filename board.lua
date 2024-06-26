@@ -1,22 +1,20 @@
 require "globals"
+require "helpers"
 
 Board = {
-  grid = {},
+  grid =
+  {
+    0,0,0,
+    0,0,0,
+    0,0,0
+  },
   total = 0,
   cellSize = 75,
   cellSpacerX = 25,
   cellSpacerY = 10,
-  images = {}
+  images = {},
+  dice = 0,
 }
-
-local N = 3
-local M = 3
-
-for i=1,N do
-  for j=1,M do
-    Board.grid[(i - 1) * M + j] = 0
-  end
-end
 
 Board.__index = Board
 
@@ -34,8 +32,10 @@ function Board.loadImages()
   end
 end
 
+-- grid
+
 function Board:getCell(idx)
-  return self.grid[idx]
+  return {value = self.grid[idx], index = idx }
 end
 
 function Board:getColumn(Number)
@@ -48,22 +48,21 @@ function Board:getColumn(Number)
 end
 
 function Board:getDuplicates(Column)
-  local values = self:getColumn(Column)
+  local column = self:getColumn(Column)
   local duplicates = {}
 
-  for index, value in ipairs(values) do
-    local globalIndex = index + (index - 1) * 2 + Column - 1
-    if duplicates[value] then
-      duplicates[value].count = duplicates[value].count + 1
-      table.insert(duplicates[value].indexes, globalIndex)
+  for _, cell in ipairs(column) do
+    if duplicates[cell.value] then
+      duplicates[cell.value].count = duplicates[cell.value].count + 1
+      table.insert(duplicates[cell.value].indexes, cell.index)
     else
-      duplicates[value] = { count = 1, indexes = { globalIndex } }
+      duplicates[cell.value] = { count = 1, indexes = { cell.index } }
     end
   end
 
   for key, value in pairs(duplicates) do
-    if value.count < 2 then 
-      duplicates[key] = nil 
+    if value.count < 2 then
+      duplicates[key] = nil
     end
   end
 
@@ -74,14 +73,28 @@ function Board:getColumnTotal(Number)
   local values = self:getColumn(Number)
   local duplicates = self:getDuplicates(Number)
   local total = 0
+  local processedValues = {}
 
-  for value, info in pairs(duplicates) do
-    if info.count > 1 then
-      total = total + value * info.count * info.count
-    else
-      total = total + value
+  for _, cell in ipairs(values) do
+    repeat
+      local value = cell.value
+
+      if processedValues[value] then
+        break
+      end
+
+      local count = duplicates[value] and duplicates[value].count or 1
+      processedValues[value] = true
+
+      -- If it's a duplicate, apply the special rule; otherwise, sum normally
+      if count > 1 then
+        total = total + value * count * count
+      else
+        total = total + value
     end
+    until true
   end
+
   return total
 end
 
@@ -91,6 +104,7 @@ function Board:drawGrid(startingY)
   local duplicates = {}
   local duplicatesPositions = {}
 
+  -- Check for duplicates
   for i = 1, 3 do
     local columnDuplicates = self:getDuplicates(i)
     table.insert(duplicates, columnDuplicates)
@@ -104,7 +118,7 @@ function Board:drawGrid(startingY)
     end
   end
 
-  -- Calculate starting positions to center the grid
+  -- Draw cells
   local startingX = (Globals.screenWidth - totalGridWidth) / 2
   if startingY == nil then
     startingY = (Globals.screenHeight - totalGridHeight / 2) / 2
@@ -130,58 +144,20 @@ function Board:drawGrid(startingY)
       love.graphics.draw(self.images[value], x, y, 0, 2.34 )
     end
   end
-end
 
--- function Board:setTotal()
--- end
+  -- Draw scores
+  for i = 1, 3 do
+    local x = startingX + (self.cellSize/2) - 10 + self.cellSize * (i-1) + self.cellSpacerX * ((i - 1) % 3)
+    love.graphics.print(tostring(self:getColumnTotal(i)), x, startingY - 20)
+   end
+end
 
 function Board:getTotal()
-end
-
-IABoard = {}
-IABoard.__index = Board
-IABoard.grid = {
-  5,2,1,
-  6,2,3,
-  6,2,4
-}
-setmetatable(IABoard, {__index = Board})
-
-function IABoard:new ()
-    local instance = setmetatable({}, {__index = IABoard})
-  return instance
-end
-
-function IABoard:display()
-  self:drawGrid(50)
-end
-
-PlayerBoard = {}
-PlayerBoard.__index = Board
-PlayerBoard.grid = {
-  6,4,3,
-  6,4,3,
-  6,4,5
-}
-setmetatable(PlayerBoard, {__index = Board})
-
-function PlayerBoard:new ()
-    local instance = setmetatable({}, {__index = PlayerBoard})
-  return instance
-end
-
-
-function PlayerBoard:display()
-  local totalGridHeight = 3 * self.cellSize + 2 * self.cellSpacerY
-  local startingY = Globals.screenHeight - totalGridHeight - 50
-  self:drawGrid(startingY)
-end
-
-function table.indexOf(tbl, element)
-  for i, value in ipairs(tbl) do
-    if value == element then
-      return i
-    end
+  local total = 0
+  for i = 1, 3 do
+    total = total + self:getColumnTotal(i)
   end
-  return nil
+  return total
 end
+
+

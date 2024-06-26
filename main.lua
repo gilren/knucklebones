@@ -1,6 +1,8 @@
 require "globals"
 require "conf"
-require "boards"
+require "board"
+require "IABoard"
+require "PlayerBoard"
 
 local elements = {}
 
