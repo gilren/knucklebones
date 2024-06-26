@@ -1,6 +1,5 @@
 require "globals"
 
-
 Board = {
   grid = {},
   total = 0,
@@ -22,7 +21,7 @@ end
 Board.__index = Board
 
 function Board.loadImages()
-  if next(Board.images) == nil then  -- Check if images are already loaded
+  if next(Board.images) == nil then 
     for i = 1, 6 do
       local imagePath = string.format("/resources/textures/dice_face_%d.png", i)
       local success, image = pcall(love.graphics.newImage, imagePath)
@@ -33,9 +32,6 @@ function Board.loadImages()
       end
     end
   end
-end
-
-function Board:display()
 end
 
 function Board:getCell(idx)
@@ -89,7 +85,7 @@ function Board:getColumnTotal(Number)
   return total
 end
 
-function Board:draw(startingY)
+function Board:drawGrid(startingY)
   local totalGridWidth = 3 * self.cellSize + 2 * self.cellSpacerX
   local totalGridHeight = 3 * self.cellSize + 2 * self.cellSpacerY
   local duplicates = {}
@@ -99,10 +95,10 @@ function Board:draw(startingY)
     local columnDuplicates = self:getDuplicates(i)
     table.insert(duplicates, columnDuplicates)
 
-    for key, value in pairs(columnDuplicates) do
+    for _, value in pairs(columnDuplicates) do
       if value.count > 1 then
         for _, pos in ipairs(value.indexes) do
-          table.insert(duplicatesPositions, pos)
+          duplicatesPositions[pos] = value.count
         end
       end
     end
@@ -118,15 +114,15 @@ function Board:draw(startingY)
     local x = startingX + self.cellSize * ((index - 1) % 3) + (self.cellSpacerX * ((index - 1) % 3))
     local y = startingY + self.cellSize * math.floor((index - 1) / 3) + self.cellSpacerY * math.floor((index - 1) / 3)
 
-    local isDuplicate = false
-    if table.indexOf(duplicatesPositions, index) then
-      isDuplicate = true
-    end
+    local dupeCount = duplicatesPositions[index]
 
-    if isDuplicate then
-      
-      love.graphics.setColor(love.math.colorFromBytes(239, 216, 123))
-    else 
+    if dupeCount then
+      if dupeCount == 2 then
+        love.graphics.setColor(love.math.colorFromBytes(239, 216, 123))
+      elseif dupeCount == 3 then
+        love.graphics.setColor(love.math.colorFromBytes(113, 174, 203))
+      end
+    else
       love.graphics.setColor(255, 255, 255)
     end
     love.graphics.rectangle("fill", x , y, self.cellSize, self.cellSize)
@@ -157,7 +153,7 @@ function IABoard:new ()
 end
 
 function IABoard:display()
-  self:draw(50)
+  self:drawGrid(50)
 end
 
 PlayerBoard = {}
@@ -178,11 +174,8 @@ end
 function PlayerBoard:display()
   local totalGridHeight = 3 * self.cellSize + 2 * self.cellSpacerY
   local startingY = Globals.screenHeight - totalGridHeight - 50
-  self:draw(startingY)
+  self:drawGrid(startingY)
 end
-
-
-
 
 function table.indexOf(tbl, element)
   for i, value in ipairs(tbl) do
