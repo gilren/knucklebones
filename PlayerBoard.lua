@@ -1,14 +1,14 @@
 PlayerBoard = {}
 PlayerBoard.__index = Board
 PlayerBoard.grid = {
-  6,4,3,
-  6,4,3,
-  6,4,5
+  6, 4, 3,
+  6, 4, 3,
+  6, 4, 5
 }
-setmetatable(PlayerBoard, {__index = Board})
+setmetatable(PlayerBoard, { __index = Board })
 
-function PlayerBoard:new ()
-    local instance = setmetatable({}, {__index = PlayerBoard})
+function PlayerBoard:new()
+  local instance = setmetatable({}, { __index = PlayerBoard })
   return instance
 end
 

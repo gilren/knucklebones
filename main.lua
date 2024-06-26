@@ -15,10 +15,9 @@ end
 function love.draw()
   IABoard:display()
   PlayerBoard:display()
-
 end
 
-function love.mousepressed( x, y, button )
+function love.mousepressed(x, y, button)
   -- if button == 1 then  -- Left mouse button
   --   for _, element in ipairs(elements) do
   --     if element:isClicked(x, y) then

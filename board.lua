@@ -4,9 +4,9 @@ require "helpers"
 Board = {
   grid =
   {
-    0,0,0,
-    0,0,0,
-    0,0,0
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0
   },
   total = 0,
   cellSize = 75,
@@ -19,7 +19,7 @@ Board = {
 Board.__index = Board
 
 function Board.loadImages()
-  if next(Board.images) == nil then 
+  if next(Board.images) == nil then
     for i = 1, 6 do
       local imagePath = string.format("/resources/textures/dice_face_%d.png", i)
       local success, image = pcall(love.graphics.newImage, imagePath)
@@ -32,19 +32,17 @@ function Board.loadImages()
   end
 end
 
--- grid
-
 function Board:getCell(idx)
-  return {value = self.grid[idx], index = idx }
+  return { value = self.grid[idx], index = idx }
 end
 
 function Board:getColumn(Number)
-  local values = {}
-  for i=1,3 do
-    local idx = Number + 3 * (i-1)
-    values[i] = self:getCell(idx)
+  local cells = {}
+  for i = 1, 3 do
+    local idx = Number + 3 * (i - 1)
+    cells[i] = self:getCell(idx)
   end
-  return values
+  return cells
 end
 
 function Board:getDuplicates(Column)
@@ -67,35 +65,6 @@ function Board:getDuplicates(Column)
   end
 
   return duplicates
-end
-
-function Board:getColumnTotal(Number)
-  local values = self:getColumn(Number)
-  local duplicates = self:getDuplicates(Number)
-  local total = 0
-  local processedValues = {}
-
-  for _, cell in ipairs(values) do
-    repeat
-      local value = cell.value
-
-      if processedValues[value] then
-        break
-      end
-
-      local count = duplicates[value] and duplicates[value].count or 1
-      processedValues[value] = true
-
-      -- If it's a duplicate, apply the special rule; otherwise, sum normally
-      if count > 1 then
-        total = total + value * count * count
-      else
-        total = total + value
-    end
-    until true
-  end
-
-  return total
 end
 
 function Board:drawGrid(startingY)
@@ -139,17 +108,46 @@ function Board:drawGrid(startingY)
     else
       love.graphics.setColor(255, 255, 255)
     end
-    love.graphics.rectangle("fill", x , y, self.cellSize, self.cellSize)
+    love.graphics.rectangle("fill", x, y, self.cellSize, self.cellSize)
     if value ~= 0 then
-      love.graphics.draw(self.images[value], x, y, 0, 2.34 )
+      love.graphics.draw(self.images[value], x, y, 0, 2.34)
     end
   end
 
   -- Draw scores
   for i = 1, 3 do
-    local x = startingX + (self.cellSize/2) - 10 + self.cellSize * (i-1) + self.cellSpacerX * ((i - 1) % 3)
+    local x = startingX + (self.cellSize / 2) - 10 + self.cellSize * (i - 1) + self.cellSpacerX * ((i - 1) % 3)
     love.graphics.print(tostring(self:getColumnTotal(i)), x, startingY - 20)
-   end
+  end
+end
+
+function Board:getColumnTotal(Number)
+  local cells = self:getColumn(Number)
+  local duplicates = self:getDuplicates(Number)
+  local total = 0
+  local processedValues = {}
+
+  for _, cell in ipairs(cells) do
+    repeat
+      local value = cell.value
+
+      if processedValues[value] then
+        break
+      end
+
+      local count = duplicates[value] and duplicates[value].count or 1
+      processedValues[value] = true
+
+      -- If it's a duplicate, apply the special rule; otherwise, sum normally
+      if count > 1 then
+        total = total + value * math.pow(count, 2)
+      else
+        total = total + value
+      end
+    until true
+  end
+
+  return total
 end
 
 function Board:getTotal()
@@ -159,5 +157,3 @@ function Board:getTotal()
   end
   return total
 end
-
-

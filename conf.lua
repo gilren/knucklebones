@@ -5,7 +5,7 @@ end
 require "globals"
 
 function love.conf(t)
-    t.window.width = Globals.screenWidth
-    t.window.height = Globals.screenHeight
-    t.window.title = "Knucklebones"
+  t.window.width = Globals.screenWidth
+  t.window.height = Globals.screenHeight
+  t.window.title = "Knucklebones"
 end
