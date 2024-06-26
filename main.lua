@@ -9,12 +9,22 @@ local elements = {}
 function love.load()
   -- Set the window mode to use the specified display (dev mode)
   love.window.setMode(Globals.screenWidth, Globals.screenHeight, { display = 2 })
-  Board.loadImages()
+
+  IABoardInstance = IABoard:new()
+  IABoardInstance:loadImages()
+
+  PlayerBoardInstance = PlayerBoard:new()
+  PlayerBoardInstance:loadImages()
+end
+
+function love.update(dt)
+  IABoardInstance:update()
+  PlayerBoardInstance:update()
 end
 
 function love.draw()
-  IABoard:display()
-  PlayerBoard:display()
+  IABoardInstance:display()
+  PlayerBoardInstance:display()
 end
 
 function love.mousepressed(x, y, button)
