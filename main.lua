@@ -1,8 +1,8 @@
 require "globals"
 require "conf"
-require "board"
-require "IABoard"
-require "PlayerBoard"
+local IABoard = require "boards/IABoard"
+local PlayerBoard = require "boards/PlayerBoard"
+
 
 local elements = {}
 
@@ -10,21 +10,24 @@ function love.load()
   -- Set the window mode to use the specified display (dev mode)
   love.window.setMode(Globals.screenWidth, Globals.screenHeight, { display = 2 })
 
+
+
+
   IABoardInstance = IABoard:new()
-  IABoardInstance:loadImages()
+  IABoardInstance:load()
 
   PlayerBoardInstance = PlayerBoard:new()
-  PlayerBoardInstance:loadImages()
+  PlayerBoardInstance:load()
 end
 
 function love.update(dt)
-  IABoardInstance:update()
-  PlayerBoardInstance:update()
+  IABoardInstance:update(dt)
+  PlayerBoardInstance:update(dt)
 end
 
 function love.draw()
-  IABoardInstance:display()
-  PlayerBoardInstance:display()
+  IABoardInstance:draw()
+  PlayerBoardInstance:draw()
 end
 
 function love.mousepressed(x, y, button)
