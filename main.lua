@@ -1,44 +1,53 @@
-require "globals"
-require "conf"
-local IABoard = require "boards/IABoard"
-local PlayerBoard = require "boards/PlayerBoard"
-
+require "core.globals"
+require "core.conf"
+require "core.battle"
 
 local elements = {}
+
+math.randomseed(Globals.seed)
 
 function love.load()
   -- Set the window mode to use the specified display (dev mode)
   love.window.setMode(Globals.screenWidth, Globals.screenHeight, { display = 2 })
 
-
-
-
-  IABoardInstance = IABoard:new()
-  IABoardInstance:load()
-
-  PlayerBoardInstance = PlayerBoard:new()
-  PlayerBoardInstance:load()
+  Battle:new()
+  Battle:load()
+  Battle:start()
 end
 
 function love.update(dt)
-  IABoardInstance:update(dt)
-  PlayerBoardInstance:update(dt)
+  Battle:update(dt)
 end
 
 function love.draw()
-  IABoardInstance:draw()
-  PlayerBoardInstance:draw()
+  Battle:draw()
 end
 
-function love.mousepressed(x, y, button)
-  -- if button == 1 then  -- Left mouse button
-  --   for _, element in ipairs(elements) do
-  --     if element:isClicked(x, y) then
-  --       element:handleClick()
-  --       break
-  --     end
-  --   end
-  -- end
+function love.keypressed(key)
+  Battle:keypressed(key)
+end
+
+function love.keyreleased(key)
+end
+
+function love.gamepadpressed(joystick, button)
+end
+
+function love.gamepadreleased(joystick, button)
+end
+
+function love.mousepressed(x, y, button, istouch)
+  Battle:mousepressed(x, y, button, istouch)
+end
+
+function love.mousereleased(x, y, button)
+end
+
+function love.mousemoved(x, y, dx, dy, istouch)
+  Battle:mousemoved(x, y, dx, dy, istouch)
+end
+
+function love.joystickaxis(joystick, axis, value)
 end
 
 local love_errorhandler = love.errorhandler

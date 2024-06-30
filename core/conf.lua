@@ -2,7 +2,7 @@ if arg[2] == "debug" then
   require("lldebugger").start()
 end
 
-require "globals"
+require "core.globals"
 
 function love.conf(t)
   t.window.width = Globals.screenWidth
